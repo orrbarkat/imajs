@@ -1,9 +1,12 @@
 const { Client, LocalAuth } = require("whatsapp-web.js");
+const {Saver} = require("saver.js");
 
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: { headless: false },
 });
+
+const saver = new Saver();
 
 client.on("loading_screen", (percent, message) => {
   console.log("LOADING SCREEN", percent, message);
@@ -25,6 +28,13 @@ client.on("auth_failure", (msg) => {
 
 client.on("ready", () => {
   console.log("READY");
+});
+
+client.on('message', async (message) => {
+  if (message.hasMedia && message.type === 'image') {
+    const media = await message.downloadMedia();
+    saver.save(message, media);
+  }
 });
 
 client.initialize();
