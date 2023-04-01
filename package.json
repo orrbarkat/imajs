@@ -1,0 +1,14 @@
+{
+  "name": "imajs",
+  "version": "0.0.1",
+  "description": "Local project to read images from your whatsapp.",
+  "main": "index.js",
+  "scripts": {
+    "test" : "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "barkat.orr@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "whatsapp-web.js": "1.19.5"
+  }
+}
