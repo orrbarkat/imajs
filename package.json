@@ -9,8 +9,10 @@
   "author": "barkat.orr@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "2.1348.0",
     "dotenv": "16.0.3",
     "fs": "0.0.1-security",
+    "sharp": "0.32.0",
     "whatsapp-web.js": "1.19.5"
   }
 }
