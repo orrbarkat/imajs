@@ -24,6 +24,7 @@ class ImageFilter {
   async compareFaces(sourceImage, referenceImagePath) {
     try {
       const referenceFilename = referenceImagePath.split('/').pop();
+      // TODO - always convert to a mimetype that aws can handle.
       const result = await this._rekognition.compareFaces({
         SourceImage: { Bytes: Buffer.from(sourceImage, "base64") },
         TargetImage: { S3Object: { Bucket: 'whatsapp-photos', Name: referenceFilename } },

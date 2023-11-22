@@ -8,8 +8,10 @@ import AWS from 'aws-sdk';
 const config = {
   storageMode: MODE_AWS,
   refrenceImages: [
-    "s3://whatsapp-photos/7e0bac58-87f6-4b64-b603-77efb2766bc7.jpg",
     // "s3://whatsapp-photos/IMG_1493.heic",
+    "s3://whatsapp-photos/7e0bac58-87f6-4b64-b603-77efb2766bc7.jpg",
+    "s3://whatsapp-photos/6d9264a8-178f-4db0-b039-c7982e9eb998.jpg",
+    "s3://whatsapp-photos/4f1cbc4f-e242-46c9-94d6-c52ba450925d.jpg",
     "s3://whatsapp-photos/IMG_20160502_090658.jpg",
     "s3://whatsapp-photos/IMG_2220.JPG",
     "s3://whatsapp-photos/IMG_7024.jpg"

@@ -44,9 +44,9 @@ class Saver {
   }
 
   static asPath(media) {
-    return (
-      `${OUTPUT_PATH}/${media.filename}`
-    );
+    const filename = media.filename ||
+      `file_${Date.now()}.${media.mimetype.split('/').pop()}`;
+    return `${OUTPUT_PATH}/${filename}`;
   }
 }
 export default Saver; // Exporting the Saver class
