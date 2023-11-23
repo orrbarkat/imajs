@@ -4,6 +4,9 @@ import Saver, { MODE_AWS } from "./saver.js";
 import ImageFilter from "./image_filter.js";
 import qrcode from 'qrcode-terminal';
 import AWS from 'aws-sdk';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
+
 
 const config = {
   storageMode: MODE_AWS,
@@ -24,12 +27,14 @@ AWS.config.update({
   region: process.env.AWS_DEFAULT_REGION
 });
 
+const { stdout: chromiumPath } = await promisify(exec)("which chromium");
+
+
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    // TODO - get chromium path programtically.
-    executablePath: "/nix/store/n6m949x5r35yf75yfaw504cb37n0fxcw-chromium-114.0.5735.106/bin/chromium"
+    executablePath: chromiumPath.trim()
   },
 });
 
