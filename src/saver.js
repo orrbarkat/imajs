@@ -4,15 +4,16 @@ import AWS from "aws-sdk";
 const OUTPUT_PATH = "filtered";
 export const MODE_LOCAL = 'local';
 export const MODE_AWS = 'AWS';
-
+export const MODE_WHATSAPP = 'whatsapp';
 
 class Saver {
-  constructor(mode) {
-    if (![MODE_LOCAL, MODE_AWS].includes(mode)) {
-      throw new Error("Mode must be 'local' or 'AWS'");
+  constructor(mode, chat) {
+    if (![MODE_LOCAL, MODE_AWS, MODE_WHATSAPP].includes(mode)) {
+      throw new Error("Mode must be 'local', 'AWS', or 'whatsapp'");
     }
     this.mode = mode;
     this._s3 = new AWS.S3();
+    this.whatsappChat = chat;
   }
 
   save(media) {
@@ -22,6 +23,9 @@ class Saver {
         break;
       case MODE_AWS:
         this.uploadFilteredPhoto(Saver.asPath(media), media);
+        break;
+      case MODE_WHATSAPP:
+        this.chat.sendMessage(media);
         break;
       default:
         throw new Error("Invalid mode");
