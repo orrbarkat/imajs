@@ -1,5 +1,6 @@
 {pkgs}: {
-  deps = [ pkgs.glib
+  deps = [
+    pkgs.git pkgs.glib
           pkgs.chromium
          ];
 }

@@ -22,7 +22,7 @@ class ImageFilter {
   }
 
   static validateImage(media) {
-    return media.mimetype === 'image/jpeg' || media.mimeType === 'image/png';
+    return media.mimetype === 'image/jpeg' || media.mimetype === 'image/png';
   }
 
   async hasFaces(image) {
@@ -30,8 +30,13 @@ class ImageFilter {
       Image: { Bytes: Buffer.from(image, "base64") },
       Attributes: ['ALL']
     };
-    const data = await this._rekognition.detectFaces(params).promise();
-    return data.FaceDetails.length > 0;
+    try {
+      const data = await this._rekognition.detectFaces(params).promise();
+      return data.FaceDetails.length > 0;
+    } catch (err) {
+      console.error(`### detect faces message: ${err.message}`);
+      console.error(`### detect faces type: ${err.__type}`);
+    }
   }
 
   async compareFaces(sourceImage, referenceImagePath) {
@@ -39,7 +44,7 @@ class ImageFilter {
       const referenceFilename = referenceImagePath.split('/').pop();
       // TODO - always convert to a mimetype that aws can handle.
       const result = await this._rekognition.compareFaces({
-        SourceImage: { Bytes: Buffer.from(sourceImage, "base64") },
+        SourceImage: { Bytes: Buffer.from(sourceImage) },
         TargetImage: { S3Object: { Bucket: 'whatsapp-photos', Name: referenceFilename } },
         SimilarityThreshold: 70,
       }).promise();
@@ -48,8 +53,9 @@ class ImageFilter {
       console.log(`filename: ${referenceFilename}, hasMatch: ${hasMatch}`);
       return { "hasMatch": hasMatch, "result": result, "filename": referenceFilename };
     } catch (err) {
-      console.error(err.message);
-      console.error(err);
+      console.error(`### cmp faces message: ${err.message}`);
+      console.error(`### cmp faces type: ${err.__type}`);
+      // console.error(err);
 
     }
     return { "hasMatch": false, "result": null }

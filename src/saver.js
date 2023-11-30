@@ -49,7 +49,7 @@ class Saver {
 
   static asPath(media) {
     const filename = media.filename ||
-      `file_${Date.now()}.${media.mimetype.split('/').pop()}`;
+      `file_${Date.now()}.${media.mimetype.split("/").pop()}`;
     return `${OUTPUT_PATH}/${filename}`;
   }
 }

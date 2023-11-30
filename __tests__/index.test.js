@@ -1,4 +1,5 @@
-import { MODE_LOCAL, MODE_AWS, Saver } from '../src/saver';
+import { MODE_LOCAL, MODE_AWS } from '../src/saver.js';
+import Saver from '../src/saver.js';
 import AWS from 'aws-sdk';
 import fs from 'fs';
 
@@ -14,9 +15,9 @@ jest.mock('aws-sdk', () => ({
   })),
 }));
 
-describe('Saver class', () => {
+describe(Saver, () => {
   const media = {
-    mimeType: 'image/jpeg',
+    mimetype: 'image/jpeg',
     data: 'some_base64_string',
     filename: 'image',
   };
@@ -26,7 +27,7 @@ describe('Saver class', () => {
   });
 
   it('should throw an error if an invalid mode is given', () => {
-    expect(() => new Saver('invalid-mode')).toThrow("Mode must be 'local' or 'AWS'");
+    expect(() => new Saver('invalid-mode')).toThrow("Mode must be 'local', 'AWS', or 'whatsapp'");
   });
 
   it('should save media locally if mode is local', () => {
@@ -52,7 +53,12 @@ describe('Saver class', () => {
   });
 
   it('should return a file path from asPath method', () => {
-    const filepath = Saver.asPath({ filename: 'test', mimeType: 'image/png' });
-    expect(filepath).toBe('output/test.png');
+    const filepath = Saver.asPath({ filename: 'test', mimetype: 'image/png' });
+    expect(filepath).toBe('filtered/test');
+  });
+
+  it('should return a file path from asPath method when no filename exists', () => {
+    const filepath = Saver.asPath({ mimetype: 'image/png' });
+    expect(filepath).toMatch(/^filtered\/file_\d+\.png$/);
   });
 });
