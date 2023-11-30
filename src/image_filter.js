@@ -11,6 +11,10 @@ class ImageFilter {
       console.log(`Invalid image type, got: ${media.mimetype}`);
       return false;
     }
+    if (!this.hasFaces(media.data)) {
+      console.log(`No faces found in image`);
+      return false;
+    }
     const comparePromises = this.referenceImagePaths.map(
       imgPath => this.compareFaces(media.data, imgPath));
     const compareResults = await Promise.all(comparePromises);
@@ -19,6 +23,15 @@ class ImageFilter {
 
   static validateImage(media) {
     return media.mimetype === 'image/jpeg' || media.mimeType === 'image/png';
+  }
+
+  async hasFaces(image) {
+    const params = {
+      Image: { Bytes: Buffer.from(image, "base64") },
+      Attributes: ['ALL']
+    };
+    const data = await this._rekognition.detectFaces(params).promise();
+    return data.FaceDetails.length > 0;
   }
 
   async compareFaces(sourceImage, referenceImagePath) {

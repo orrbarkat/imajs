@@ -75,19 +75,6 @@ async function createWhatsappSaver() {
   saver = new Saver(config.storageMode, chat);
 }
 
-async function downloadMediaWithRetries(message) {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      const media = await message.downloadMedia();
-      if (media) return media;
-    } catch (error) {
-      console.log(`Attempt ${attempt + 1} failed to download media.`);
-      if (attempt === 2) throw error;
-    }
-  }
-  throw new Error("Failed to download media after 3 attempts.");
-}
-
 client.on('message', async (message) => {
   // console.debug(`New message from ${message.from}: ${message.body} `);
   if (message.hasMedia) {
@@ -106,5 +93,18 @@ client.on('message', async (message) => {
     }
   }
 });
+
+async function downloadMediaWithRetries(message) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const media = await message.downloadMedia();
+      if (media) return media;
+    } catch (error) {
+      console.log(`Attempt ${attempt + 1} failed to download media.`);
+      if (attempt === 2) throw error;
+    }
+  }
+  throw new Error("Failed to download media after 3 attempts.");
+}
 
 client.initialize();
