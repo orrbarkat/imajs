@@ -7,25 +7,25 @@ export const MODE_AWS = 'AWS';
 export const MODE_WHATSAPP = 'whatsapp';
 
 class Saver {
-  constructor(mode, chat) {
+  constructor(mode, chat, s3 = new AWS.S3()) {
     if (![MODE_LOCAL, MODE_AWS, MODE_WHATSAPP].includes(mode)) {
       throw new Error("Mode must be 'local', 'AWS', or 'whatsapp'");
     }
     this.mode = mode;
-    this._s3 = new AWS.S3();
+    this._s3 = s3;
     this.whatsappChat = chat;
   }
 
-  save(media) {
+  async save(media) {
     switch (this.mode) {
       case MODE_LOCAL:
         fs.writeFile(Saver.asPath(media), media.data, { encoding: "base64" });
         break;
       case MODE_AWS:
-        this.uploadFilteredPhoto(Saver.asPath(media), media);
+        await this.uploadFilteredPhoto(Saver.asPath(media), media);
         break;
       case MODE_WHATSAPP:
-        this.chat.sendMessage(media);
+        await this.chat.sendMessage(media);
         break;
       default:
         throw new Error("Invalid mode");
@@ -34,6 +34,7 @@ class Saver {
 
   async uploadFilteredPhoto(path, media) {
     try {
+      console.log(this._s3); // This should output the mock or the AWS S3 object
       const uploadData = await this._s3.upload({
         Bucket: 'whatsapp-photos',
         Key: path,

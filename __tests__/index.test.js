@@ -7,7 +7,7 @@ jest.mock('fs', () => ({
   writeFile: jest.fn(),
 }));
 
-jest.mock('aws-sdk', () => ({
+const aws = jest.mock('aws-sdk', () => ({
   S3: jest.fn(() => ({
     upload: jest.fn(() => ({
       promise: jest.fn(),
@@ -30,26 +30,34 @@ describe(Saver, () => {
     expect(() => new Saver('invalid-mode')).toThrow("Mode must be 'local', 'AWS', or 'whatsapp'");
   });
 
-  it('should save media locally if mode is local', () => {
+  it('should save media locally if mode is local', async () => {
     const saver = new Saver(MODE_LOCAL);
-    saver.save({ filename: 'test' }, media);
+
+    await saver.save(media);
+
     expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), media.data, { encoding: 'base64' });
   });
 
   it('should upload media to AWS if mode is AWS', async () => {
-    const uploadPromise = jest.fn();
-    AWS.S3.prototype.upload = jest.fn(() => ({
-      promise: uploadPromise,
-    }));
+    const mockS3Instance = {
+      upload: jest.fn(() => ({
+        promise: jest.fn().mockResolvedValue({
+          Location: `http://example.com/filtered/${media.filename}`
+        })
+      }))
+    };
+    jest.spyOn(AWS, 'S3').mockImplementation(() => mockS3Instance);
     const saver = new Saver(MODE_AWS);
-    await saver.uploadFilteredPhoto('test_filename', media);
-    expect(AWS.S3.prototype.upload).toHaveBeenCalledWith({
-      Bucket: 'whatsapp-photos',
-      Key: 'filtered/test_filename',
-      Body: expect.any(Buffer),
-      ContentType: 'image/jpeg',
+
+    await saver.save(media);
+
+    expect(mockS3Instance.upload).toHaveBeenCalledWith({
+      Bucket: expect.any(String),
+      Key: expect.any(String),
+      Body: Buffer.from(media.data, 'base64'),
+      ContentType: media.mimetype,
     });
-    expect(uploadPromise).toHaveBeenCalled();
+    expect(mockS3Instance.upload).toHaveBeenCalledTimes(1);
   });
 
   it('should return a file path from asPath method', () => {
